@@ -56,3 +56,15 @@ Since some parts are make or break, these will be fixed.
   - Propeller: 4-Blade Nylon, 60mm diameter
   - Total Length: 75mm
   - Price: $20.00 each (need 2)
+
+### Controller
+- **Model**: Wishiot ESP32 LoRa V3 Development Board
+- **Link**: [Amazon Link](https://www.amazon.com/dp/B0D2DBRR6T)
+- **Specifications**:
+  - Microcontroller: ESP32-S3FN8 with dual-core Xtensa LX7 architecture
+  - CPU Speed: Up to 240 MHz
+  - RAM: 512 KB
+  - Flash Memory: 8 MB
+  - Connectivity: WiFi, LoRa, and BLE
+  - Display: 0.96-inch OLED
+  - Price: $24.98

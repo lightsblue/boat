@@ -44,8 +44,8 @@
 - Compact, water-resistant design suitable for flatwater environments
 
 # Parts that we'll work from
-Since some parts are make or break, these will be fixed.
-### Motor
+
+### Motor (will have two which will allow for steering)
 - **Model**: DNYSYSJ Brushless Motor Underwater Thruster
 - **Link**: [Amazon Link](https://www.amazon.com/DNYSYSJ-Brushless-Underwater-Thruster-Propeller/dp/B0B3J4CM9H/ref=sr_1_6?crid=1DUJ6560P1L1F&dib=eyJ2IjoiMSJ9.cSCgbRjYAkYqYru0KZvQkfGSR4QJpNoS0l1dPxNY_zRS1fzA1ROwOallx95HSLTVNKq3m2RPGEAhpBQzskeJAl1HusW-5cnARE7kFjcKTW4_0ISvuJIgTjQt3hjA5RtgjvTY2WYUrw8D0Jog-J-ezcZRZSisWwM-p7Sn-FN4-Zs52RuIKmHeJcVhNN90LiMSxx3uvmIoNIDO5O7cwdB5Hp7GN4DL_SZT7zhMvTBjun9pRMlLWay3WU3Smht8OPbAU1706fSacS69lfevVSXBOFnKCaQY5OZXDG5nZEE_dqo.cRxn2haDHBs9dYN9fsLQUX9mptjmGgjkuBsUtU2PLug&dib_tag=se&keywords=dc%2BBrushless%2BUnderwater%2BThruster&qid=1744845912&s=toys-and-games&sprefix=dc%2Bbrushless%2Bunderwater%2Bthruster%2Ctoys-and-games%2C74&sr=1-6&th=1)
 - **Specifications**:

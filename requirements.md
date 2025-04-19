@@ -47,7 +47,7 @@
 
 ### Motor (will have two which will allow for steering)
 - **Model**: DNYSYSJ Brushless Motor Underwater Thruster
-- **Link**: [Amazon Link](https://www.amazon.com/DNYSYSJ-Brushless-Underwater-Thruster-Propeller/dp/B0B3J4CM9H/ref=sr_1_6?crid=1DUJ6560P1L1F&dib=eyJ2IjoiMSJ9.cSCgbRjYAkYqYru0KZvQkfGSR4QJpNoS0l1dPxNY_zRS1fzA1ROwOallx95HSLTVNKq3m2RPGEAhpBQzskeJAl1HusW-5cnARE7kFjcKTW4_0ISvuJIgTjQt3hjA5RtgjvTY2WYUrw8D0Jog-J-ezcZRZSisWwM-p7Sn-FN4-Zs52RuIKmHeJcVhNN90LiMSxx3uvmIoNIDO5O7cwdB5Hp7GN4DL_SZT7zhMvTBjun9pRMlLWay3WU3Smht8OPbAU1706fSacS69lfevVSXBOFnKCaQY5OZXDG5nZEE_dqo.cRxn2haDHBs9dYN9fsLQUX9mptjmGgjkuBsUtU2PLug&dib_tag=se&keywords=dc%2BBrushless%2BUnderwater%2BThruster&qid=1744845912&s=toys-and-games&sprefix=dc%2Bbrushless%2Bunderwater%2Bthruster%2Ctoys-and-games%2C74&sr=1-6&th=1)
+- **Link**: [Amazon Link](https://www.amazon.com/DNYSYSJ-Brushless-Underwater-Thruster-Propeller/dp/B0B3J4CM9H/)
 - **Specifications**:
   - Voltage: 12V-24V
   - Power: 30-200W
@@ -56,6 +56,22 @@
   - Propeller: 4-Blade Nylon, 60mm diameter
   - Total Length: 75mm
   - Price: $20.00 each (need 2)
+
+### Electronic Speed Controller (ESC)
+- **Model**: 30A RC Brushless Motor Electric Speed Controller ESC (Multi-Directional)
+- **Link**: [Amazon Link](https://www.amazon.com/RC-Brushless-Electric-Controller-bullet/dp/B0C5RYKSV2/)
+- **Specifications**:
+  - Current Rating: 30A
+  - UBEC: 5V/3A
+  - Input Voltage: LiPo 2-4s (6.4V - 16.8V)
+  - Connectors: Pre-soldered XT60 & 3.5mm bullet plugs
+  - Features: 
+    - Bi-directional control
+    - Low Battery Protection
+    - Overheat Protection
+    - Signal Loss Protection
+    - Programmable
+  - Price: $18.99 each (need 2)
 
 ### Controller
 - **Model**: Wishiot ESP32 LoRa V3 Development Board
@@ -68,3 +84,40 @@
   - Connectivity: WiFi, LoRa, and BLE
   - Display: 0.96-inch OLED
   - Price: $24.98
+
+### System Architecture
+```mermaid
+graph TD
+    subgraph Remote Control
+        MacBook[MacBook with LoRa Dongle]
+    end
+
+    subgraph Boat System
+        ESP32[ESP32 LoRa Controller]
+        Battery[12V Battery]
+        
+        subgraph ESC System 1
+            ESC1[ESC 1 - 30A]
+            Motor1[Brushless Motor 1]
+            ESP32 -->|GPIO4 PWM| ESC1
+            Battery -->|XT60 12V+| ESC1
+            ESC1 -->|3.5mm Bullets| Motor1
+        end
+        
+        subgraph ESC System 2
+            ESC2[ESC 2 - 30A]
+            Motor2[Brushless Motor 2]
+            ESP32 -->|GPIO5 PWM| ESC2
+            Battery -->|XT60 12V+| ESC2
+            ESC2 -->|3.5mm Bullets| Motor2
+        end
+        
+        Battery -->|GND| ESP32
+        ESC1 -->|5V UBEC| ESP32
+    end
+
+    MacBook <--LoRa--> ESP32
+
+    classDef power fill:#f96
+    class Battery power
+```

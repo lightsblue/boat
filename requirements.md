@@ -237,3 +237,28 @@ This milestone verifies basic motor control using the ESP32 controller powered b
     *   You can initially power the ESP32 via USB for programming, then disconnect USB and power it solely from the ESC 1 UBEC for a full test (once the battery is connected).
 
 **Next Steps:** Once basic motor control is verified, proceed to LoRa communication setup and more advanced control logic.
+
+``` mermaid
+graph TD
+    Battery["12V LiFePO4 Battery"]
+    RingTerminals["M6 Ring Terminals"]
+    XT60["XT60 Connectors"]
+    Wire["12 AWG Wire"]
+    ESC1["ESC 1"]
+    ESC2["ESC 2"]
+    Motor1["Motor 1"]
+    Motor2["Motor 2"]
+    ESP32["ESP32 LoRa V3"]
+    PC["Computer (USB-C)"]
+    Jumpers["Jumper Wires"]
+
+    Battery -- "via Ring Terminals" --> RingTerminals
+    RingTerminals -- "via 12 AWG Wire" --> XT60
+    XT60 -- "Power" --> ESC1
+    XT60 -- "Power" --> ESC2
+    ESC1 -- "3x Bullet Connectors" --> Motor1
+    ESC2 -- "3x Bullet Connectors" --> Motor2
+    ESC1 -- "UBEC 5V/GND/Signal (Jumper Wires)" --> ESP32
+    ESC2 -- "GND/Signal (Jumper Wires)" --> ESP32
+    ESP32 -- "USB-C" --> PC
+```

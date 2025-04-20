@@ -43,7 +43,47 @@
 - Parts of hull(s) or electronics enclosure, or other parts may be be custom 3D printed
 - Compact, water-resistant design suitable for flatwater environments
 
-# Parts that we'll work from
+### System Architecture
+```mermaid
+graph TD
+    subgraph Remote Control
+        MacBook[MacBook with LoRa Dongle]
+    end
+
+    subgraph Boat System
+        ESP32[ESP32 LoRa Controller]
+        Battery[12.8V 20Ah LiFePO4 Battery]
+        BMS[Built-in 20A BMS]
+        
+        subgraph ESC System 1
+            ESC1[ESC 1 - 30A]
+            Motor1[Brushless Motor 1]
+            ESP32 -->|GPIO4 PWM| ESC1
+            Battery -->|M6 Terminal +| ESC1
+            ESC1 -->|3.5mm Bullets| Motor1
+        end
+        
+        subgraph ESC System 2
+            ESC2[ESC 2 - 30A]
+            Motor2[Brushless Motor 2]
+            ESP32 -->|GPIO5 PWM| ESC2
+            Battery -->|M6 Terminal +| ESC2
+            ESC2 -->|3.5mm Bullets| Motor2
+        end
+        
+        Battery --> BMS
+        BMS -->|GND| ESC1
+        BMS -->|GND| ESC2
+        ESC1 -->|5V UBEC| ESP32
+    end
+
+    MacBook <--LoRa--> ESP32
+
+    classDef power fill:#f96
+    class Battery,BMS power
+```
+
+# Parts
 
 ### Motor (will have two which will allow for steering)
 - **Model**: DNYSYSJ Brushless Motor Underwater Thruster
@@ -85,39 +125,115 @@
   - Display: 0.96-inch OLED
   - Price: $24.98
 
-### System Architecture
-```mermaid
-graph TD
-    subgraph Remote Control
-        MacBook[MacBook with LoRa Dongle]
-    end
+### Battery
+- **Model**: GOLDENMATE 12V 20Ah LiFePO4 Battery
+- **Link**: [Amazon Link](https://www.amazon.com/dp/B0C...)
+- **Specifications**:
+  - Voltage: 12.8V
+  - Capacity: 20Ah (256Wh)
+  - Chemistry: LiFePO4 (Lithium Iron Phosphate)
+  - Cycle Life: 5000+ cycles
+  - Waterproof Rating: IP67
+  - Built-in BMS: 20A protection
+  - Max Continuous Discharge: 10A
+  - Max Charging Current: 10A
+  - Weight: 5.95 lbs
+  - Dimensions: 2.99"D x 7.13"W x 6.61"H
+  - Terminals: M6
+  - Price: $69.99
 
-    subgraph Boat System
-        ESP32[ESP32 LoRa Controller]
-        Battery[12V Battery]
-        
-        subgraph ESC System 1
-            ESC1[ESC 1 - 30A]
-            Motor1[Brushless Motor 1]
-            ESP32 -->|GPIO4 PWM| ESC1
-            Battery -->|XT60 12V+| ESC1
-            ESC1 -->|3.5mm Bullets| Motor1
-        end
-        
-        subgraph ESC System 2
-            ESC2[ESC 2 - 30A]
-            Motor2[Brushless Motor 2]
-            ESP32 -->|GPIO5 PWM| ESC2
-            Battery -->|XT60 12V+| ESC2
-            ESC2 -->|3.5mm Bullets| Motor2
-        end
-        
-        Battery -->|GND| ESP32
-        ESC1 -->|5V UBEC| ESP32
-    end
+### Connectors and Waterproofing Components
 
-    MacBook <--LoRa--> ESP32
+Option 1 - Individual Components (Total: $71-89):
+| Component | Specifications | Purpose | Quantity | Est. Price |
+|-----------|---------------|----------|----------|------------|
+| M6 Ring Terminals | Marine-grade, tinned copper with adhesive heat shrink | Battery power connections | 4 pcs | $8-10 |
+| 12 AWG Marine Wire | Tinned copper, red/black, marine-grade | Power distribution | 6 ft each | $12-15 |
+| 3.5mm Bullet Connectors | Gold plated, with heat shrink | Motor connections | 6 pairs | $8-10 |
+| IP67 Toggle Switch | 20A rated, panel mount, marine-grade | Main power control | 1 pc | $10-12 |
+| Cable Glands | IP67 rated, various sizes | Hull penetration sealing | 4 pcs | $8-10 |
+| Wire Loom Kit | Marine split-type, UV resistant | Wire protection | 6 ft | $6-8 |
+| Silicone Sealant | Marine-grade, clear | Additional waterproofing | 1 tube | $6-8 |
+| Dielectric Grease | Waterproof, non-conductive | Connection protection | 1 tube | $5-6 |
+| Heat Shrink Tubing | Marine-grade, adhesive-lined, various sizes | Connection sealing | 1 kit | $8-10 |
 
-    classDef power fill:#f96
-    class Battery power
-```
+Option 2 - Cost-Optimized Combo Kits (Total: $45-55):
+1. Marine Connection Kit ($25-30):
+   - 120pc Waterproof Heat Shrink Connectors
+   - Includes ring terminals, butt connectors
+   - Marine-grade with adhesive lining
+   - Crimping tool included
+
+2. Essential Waterproofing Kit ($20-25):
+   - Marine-grade wire (12 AWG, 10ft total)
+   - IP67 toggle switch
+   - Cable glands (4pc)
+   - Dielectric grease
+   - Marine silicone sealant
+
+Notes:
+- All connections should use marine-grade components with proper waterproofing
+- Heat shrink should be applied over all connections
+- Dielectric grease should be used in all electrical connections
+- Cable glands should be used wherever wires penetrate the hull
+- Create drip loops in wiring to prevent water tracking
+- Double-seal critical connections with both heat shrink and silicone
+
+## Milestone 1: Desk Test (Battery, Controller, ESCs, Motors)
+
+This milestone verifies basic motor control using the ESP32 controller powered by the battery.
+
+### Ingredients (Minimal Parts Required)
+
+**Core Components:**
+*   GOLDENMATE 12V 20Ah LiFePO4 Battery (1x)
+*   Wishiot ESP32 LoRa V3 Development Board (1x)
+*   30A RC Brushless Motor ESC (2x)
+*   DNYSYSJ Brushless Motor Underwater Thruster (2x)
+
+**Connection Components:**
+*   M6 Ring Terminals (2x)
+*   XT60 Female Connectors (2x)
+*   12 AWG Wire (Red & Black, ~1 foot each)
+*   Female-to-Female Jumper Wires (~6 pcs)
+*   USB-C Cable (for programming/powering ESP32 initially)
+
+**Tools:**
+*   Soldering Iron & Solder
+*   Wire Stripper/Cutter
+*   Screwdriver/Wrench for M6 terminals
+*   Computer with Arduino IDE or PlatformIO configured for ESP32
+
+### Steps (Desk Assembly Recipe)
+
+**Safety First:** Disconnect the battery whenever making connections. Be cautious when motors are armed.
+
+1.  **Prepare Battery Connections:**
+    *   Cut two ~6-inch lengths of 12 AWG Red wire and two of Black wire.
+    *   Solder one end of a Red wire to the positive (+) pin of an XT60 Female connector. Solder one end of a Black wire to the negative (-) pin.
+    *   Crimp or solder an M6 Ring Terminal onto the other end of the Red wire.
+    *   Repeat step 1.2 and 1.3 for the second XT60 connector and the remaining Red/Black wires and ring terminal.
+2.  **Connect ESCs to Power:**
+    *   Attach the Red wire's ring terminal to the battery's positive (+) M6 post.
+    *   Attach the Black wire's ring terminal to the battery's negative (-) M6 post.
+    *   Plug the XT60 connectors into the power input of each ESC.
+3.  **Connect Motors to ESCs:**
+    *   Plug the three bullet connectors from Motor 1 into the three motor output connectors on ESC 1. Order doesn't matter initially (can be swapped later if motor spins backward).
+    *   Repeat for Motor 2 and ESC 2.
+4.  **Connect ONE ESC's UBEC to ESP32:**
+    *   Identify the 3-pin servo connector coming from ESC 1 (Signal, 5V, GND).
+    *   Using jumper wires, connect:
+        *   ESC 1 **GND** pin (Black/Brown) --> ESP32 **GND** pin.
+        *   ESC 1 **5V** pin (Red) --> ESP32 **5V** pin.
+    *   **IMPORTANT:** For ESC 2, connect **ONLY** the **GND** pin (Black/Brown) to another ESP32 **GND** pin. **DO NOT connect the 5V (Red) wire from ESC 2 to the ESP32.**
+5.  **Connect ESC Signal Wires to ESP32:**
+    *   Using jumper wires, connect:
+        *   ESC 1 **Signal** pin (White/Yellow) --> ESP32 **GPIO4** pin.
+        *   ESC 2 **Signal** pin (White/Yellow) --> ESP32 **GPIO5** pin.
+6.  **Program and Test:**
+    *   Connect the ESP32 to your computer via USB-C.
+    *   Upload a simple test sketch (e.g., using the Arduino `ESP32Servo` library) to send PWM signals to GPIO4 and GPIO5.
+    *   Start with low PWM values to test motor spin direction and basic control.
+    *   You can initially power the ESP32 via USB for programming, then disconnect USB and power it solely from the ESC 1 UBEC for a full test (once the battery is connected).
+
+**Next Steps:** Once basic motor control is verified, proceed to LoRa communication setup and more advanced control logic.

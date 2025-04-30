@@ -1,142 +1,98 @@
-#include <Wire.h>
-#include "HT_SSD1306Wire.h" // legacy include: `#include "SSD1306.h"`
-#include "HT_DisplayUi.h"
-#include "images.h"
+/*
+  Milestone 1 PWM + OLED status display
 
+  PWM (Pulse-Width Modulation) is a way to simulate an analog voltage
+  by switching a digital pin on and off at a fixed frequency. The
+  “duty cycle” (ratio of on-time to total period) sets the effective
+  power. For example, at 50% duty on a 3.3 V ESP32 pin you get ~1.65 V.
+
+  We use PWM here to drive the ESC signal pins: they expect a pulse
+  train (typically 50 Hz–400 Hz on RC gear, but many ESCs work up to
+  1 kHz). By changing duty you change motor throttle.
+*/
+
+#include <Wire.h>
+#include "HT_SSD1306Wire.h"    // Heltec SSD1306 driver
+#include "HT_DisplayUi.h"      // UI framework for Heltec OLED
+
+// === PWM settings ===
+const int      pinA    = 4;      // GPIO4 → ESC 1 signal
+const int      pinB    = 5;      // GPIO5 → ESC 2 signal
+const uint32_t pwmFreq = 1000;   // 1 kHz PWM frequency
+const uint8_t  pwmRes  = 8;      // 8-bit resolution (0–255 duty values)
+const int      dutyA   = 128;    // 128/255 ≈ 50% duty cycle
+const int      dutyB   =  64;    // 64/255 ≈ 25% duty cycle
+
+// === OLED wiring & setup ===
 #ifdef WIRELESS_STICK_V3
-static SSD1306Wire  display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_64_32, RST_OLED); // addr , freq , i2c group , resolution , rst
+  // V3 board: 64×32 display
+  static SSD1306Wire display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_64_32, RST_OLED);
 #else
-static SSD1306Wire  display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED); // addr , freq , i2c group , resolution , rst
+  // Non-V3 board: 128×64 display
+  static SSD1306Wire display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);
 #endif
 
-DisplayUi ui( &display );
+DisplayUi ui(&display);          // UI controller
 
-void msOverlay(ScreenDisplay *display, DisplayUiState* state) {
-  display->setTextAlignment(TEXT_ALIGN_RIGHT);
-  display->setFont(ArialMT_Plain_10);
-  display->drawString(128, 0, String(millis()));
+// === Overlay function: runs on top of every frame ===
+void msOverlay(ScreenDisplay* dsp, DisplayUiState* state) {
+  dsp->setTextAlignment(TEXT_ALIGN_RIGHT);
+  dsp->setFont(ArialMT_Plain_10);
+
+  // top-right corner: uptime in milliseconds
+  dsp->drawString(display.width()-1,  0, String(millis()));
+
+  // below that: show each PWM duty value
+  dsp->drawString(display.width()-1, 10, "A:" + String(dutyA));
+  dsp->drawString(display.width()-1, 20, "B:" + String(dutyB));
 }
 
-void drawFrame1(ScreenDisplay *display, DisplayUiState* state, int16_t x, int16_t y) {
-  // draw an xbm image.
-  // Please note that everything that should be transitioned
-  // needs to be drawn relative to x and y
+// placeholder frame callbacks
+void drawFrame1(ScreenDisplay* dsp, DisplayUiState* st, int16_t x, int16_t y) { }
+void drawFrame2(ScreenDisplay* dsp, DisplayUiState* st, int16_t x, int16_t y) { }
+void drawFrame3(ScreenDisplay* dsp, DisplayUiState* st, int16_t x, int16_t y) { }
+void drawFrame4(ScreenDisplay* dsp, DisplayUiState* st, int16_t x, int16_t y) { }
+void drawFrame5(ScreenDisplay* dsp, DisplayUiState* st, int16_t x, int16_t y) { }
 
-  display->drawXbm(x + 34, y + 14, WiFi_Logo_width, WiFi_Logo_height, WiFi_Logo_bits);
-}
-
-void drawFrame2(ScreenDisplay *display, DisplayUiState* state, int16_t x, int16_t y) {
-  // Demonstrates the 3 included default sizes. The fonts come from SSD1306Fonts.h file
-  // Besides the default fonts there will be a program to convert TrueType fonts into this format
-  display->setTextAlignment(TEXT_ALIGN_LEFT);
-  display->setFont(ArialMT_Plain_10);
-  display->drawString(0 + x, 10 + y, "Arial 10");
-
-  display->setFont(ArialMT_Plain_16);
-  display->drawString(0 + x, 20 + y, "Arial 16");
-
-  display->setFont(ArialMT_Plain_24);
-  display->drawString(0 + x, 34 + y, "Arial 24");
-}
-
-void drawFrame3(ScreenDisplay *display, DisplayUiState* state, int16_t x, int16_t y) {
-  // Text alignment demo
-  display->setFont(ArialMT_Plain_10);
-
-  // The coordinates define the left starting point of the text
-  display->setTextAlignment(TEXT_ALIGN_LEFT);
-  display->drawString(0 + x, 11 + y, "Left aligned (0,10)");
-
-  // The coordinates define the center of the text
-  display->setTextAlignment(TEXT_ALIGN_CENTER);
-  display->drawString(64 + x, 22 + y, "Center aligned (64,22)");
-
-  // The coordinates define the right end of the text
-  display->setTextAlignment(TEXT_ALIGN_RIGHT);
-  display->drawString(128 + x, 33 + y, "Right aligned (128,33)");
-}
-
-void drawFrame4(ScreenDisplay *display, DisplayUiState* state, int16_t x, int16_t y) {
-  // Demo for drawStringMaxWidth:
-  // with the third parameter you can define the width after which words will be wrapped.
-  // Currently only spaces and "-" are allowed for wrapping
-  display->setTextAlignment(TEXT_ALIGN_LEFT);
-  display->setFont(ArialMT_Plain_10);
-  display->drawStringMaxWidth(0 + x, 10 + y, 128, "Lorem ipsum\n dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore.");
-}
-
-void drawFrame5(ScreenDisplay *display, DisplayUiState* state, int16_t x, int16_t y) {
-
-}
-
-
-void VextON(void)
-{
-  pinMode(Vext,OUTPUT);
-  digitalWrite(Vext, LOW);
-}
-
-void VextOFF(void) //Vext default OFF
-{
-  pinMode(Vext,OUTPUT);
-  digitalWrite(Vext, HIGH);
-}
-
-// This array keeps function pointers to all frames
-// frames are the single views that slide in
-FrameCallback frames[] = { drawFrame1, drawFrame2, drawFrame3, drawFrame4, drawFrame5 };
-
-// how many frames are there?
-int frameCount = 5;
-
-// Overlays are statically drawn on top of a frame eg. a clock
+// array of frame callbacks (empty, but required by the UI)
+FrameCallback  frames[]    = { drawFrame1, drawFrame2, drawFrame3, drawFrame4, drawFrame5 };
+const int      frameCount  = sizeof(frames) / sizeof(frames[0]);
 OverlayCallback overlays[] = { msOverlay };
-int overlaysCount = 1;
+const int      overlaysCount = sizeof(overlays) / sizeof(overlays[0]);
+
+// control pin for powering the OLED (per Heltec hardware design)
+void VextON()  { pinMode(Vext, OUTPUT); digitalWrite(Vext, LOW);  }
+void VextOFF() { pinMode(Vext, OUTPUT); digitalWrite(Vext, HIGH); }
 
 void setup() {
   Serial.begin(115200);
-  Serial.println();
-  Serial.println();
+  
+  // turn on OLED power rail (Vext pin)
   VextON();
   delay(100);
-	// The ESP is capable of rendering 60fps in 80Mhz mode
-	// but that won't give you much time for anything else
-	// run it in 160Mhz mode or just set it to 30 fps
-  ui.setTargetFPS(60);
 
-	// Customize the active and inactive symbol
-  ui.setActiveSymbol(activeSymbol);
-  ui.setInactiveSymbol(inactiveSymbol);
+  // === configure PWM outputs ===
+  // set frequency, resolution, then initial duty
+  analogWriteFrequency(pinA, pwmFreq);
+  analogWriteResolution(pinA, pwmRes);
+  analogWriteFrequency(pinB, pwmFreq);
+  analogWriteResolution(pinB, pwmRes);
 
-  // You can change this to
-  // TOP, LEFT, BOTTOM, RIGHT
-  ui.setIndicatorPosition(BOTTOM);
+  // send PWM to ESCs (they’ll arm and beep)
+  analogWrite(pinA, dutyA);
+  analogWrite(pinB, dutyB);
 
-  // Defines where the first frame is located in the bar.
-  ui.setIndicatorDirection(LEFT_RIGHT);
-
-  // You can change the transition that is used
-  // SLIDE_LEFT, SLIDE_RIGHT, SLIDE_UP, SLIDE_DOWN
-  ui.setFrameAnimation(SLIDE_LEFT);
-
-  // Add frames
-  ui.setFrames(frames, frameCount);
-
-  // Add overlays
-  ui.setOverlays(overlays, overlaysCount);
-
-  // Initialising the UI will init the display too.
-  ui.init();
+  // === initialize the display + UI ===
+  ui.setTargetFPS(30);                    // update UI at 30 frames/sec
+  ui.setFrames(frames, frameCount);       // supply our (empty) frames
+  ui.setOverlays(overlays, overlaysCount);// supply our overlay
+  ui.init();                              // OLED power-up + start animation
 }
 
-
 void loop() {
-  int remainingTimeBudget = ui.update();
-
-  if (remainingTimeBudget > 0) {
-    // You can do some work here
-    // Don't do stuff if you are below your
-    // time budget.
-    delay(remainingTimeBudget);
+  // drive the UI state machine; returns leftover time
+  int timeLeft = ui.update();
+  if (timeLeft > 0) {
+    delay(timeLeft);  // avoid burning CPU
   }
 }

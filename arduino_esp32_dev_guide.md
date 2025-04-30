@@ -1,9 +1,3 @@
-Got it — you want a tighter version, still clear enough for someone *new* following along, and professional enough for a dev guide.
-
-Here’s a **boiled-down, clean version** you can drop into your GitHub Arduino dev guide:
-
----
-
 # Heltec WiFi LoRa 32 (V3) Setup Guide (ESP32-S3)
 
 This guide walks through a clean setup for developing with the Heltec WiFi LoRa 32 (V3) board (ESP32-S3 variant).

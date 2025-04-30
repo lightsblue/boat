@@ -241,21 +241,27 @@ This milestone verifies basic motor control using the ESP32 controller powered b
 ``` mermaid
 graph TD
     Battery["12V LiFePO4 Battery"]
-    RingTerminals["M6 Ring Terminals"]
-    XT60["XT60 Connectors"]
-    Wire["12 AWG Wire"]
+    RingTerminals1["M6 Ring Terminals"]
+    RingTerminals2["M6 Ring Terminals"]
+    XT60_1["XT60 Connector"]
+    XT60_2["XT60 Connector"]
     ESC1["ESC 1"]
     ESC2["ESC 2"]
     Motor1["Motor 1"]
     Motor2["Motor 2"]
     ESP32["ESP32 LoRa V3"]
     PC["Computer (USB-C)"]
-    Jumpers["Jumper Wires"]
+    Fuse1["30A Fuse"]
+    Fuse2["30A Fuse"]
 
-    Battery -- "via Ring Terminals" --> RingTerminals
-    RingTerminals -- "via 12 AWG Wire" --> XT60
-    XT60 -- "Power" --> ESC1
-    XT60 -- "Power" --> ESC2
+    Battery -- "via Ring Terminals" --> RingTerminals1
+    Battery -- "via Ring Terminals" --> RingTerminals2
+    RingTerminals1 -- "via 12 AWG Wire" --> XT60_1
+    RingTerminals2 -- "via 12 AWG Wire" --> XT60_2
+    XT60_1 -- "Power" --> Fuse1
+    Fuse1 -- "Power" --> ESC1
+    XT60_2 -- "Power" --> Fuse2
+    Fuse2 -- "Power" --> ESC2
     ESC1 -- "3x Bullet Connectors" --> Motor1
     ESC2 -- "3x Bullet Connectors" --> Motor2
     ESC1 -- "UBEC 5V/GND/Signal (Jumper Wires)" --> ESP32

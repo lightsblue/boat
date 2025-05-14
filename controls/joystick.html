@@ -69,6 +69,11 @@
     let dragging = false;
     let startX, startY;
 
+    // Configurable debounce interval (ms)
+    const DEBOUNCE_INTERVAL = 200;
+    let lastSendTime = 0;
+    let pendingSend = null;
+
     function setJoystick(x, y) {
       joystick.style.left = `${x}px`;
       joystick.style.top = `${y}px`;
@@ -86,7 +91,33 @@
       let right = yPct - xPct;
       left = Math.max(-100, Math.min(100, left));
       right = Math.max(-100, Math.min(100, right));
+      debounceSend(left, right);
+    }
+
+    function sendMotorCommand(left, right) {
+      // This is where the HTTP request would go
       motors.innerHTML = `Left Motor: ${left}%<br>Right Motor: ${right}%`;
+      console.log(`Left Motor: ${left}%, Right Motor: ${right}%`);
+    }
+
+    function debounceSend(left, right) {
+      const now = Date.now();
+      const timeSinceLast = now - lastSendTime;
+      if (timeSinceLast >= DEBOUNCE_INTERVAL) {
+        sendMotorCommand(left, right);
+        lastSendTime = now;
+        if (pendingSend) {
+          clearTimeout(pendingSend);
+          pendingSend = null;
+        }
+      } else {
+        if (pendingSend) clearTimeout(pendingSend);
+        pendingSend = setTimeout(() => {
+          sendMotorCommand(left, right);
+          lastSendTime = Date.now();
+          pendingSend = null;
+        }, DEBOUNCE_INTERVAL - timeSinceLast);
+      }
     }
 
     function handleMove(clientX, clientY) {

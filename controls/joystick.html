@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2D Joystick Control</title>
+  <title>Boat Control</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -48,17 +48,21 @@
   </style>
 </head>
 <body>
-  <h2>2D Joystick Control</h2>
+  <h2>Boat Control</h2>
   <div class="joystick-container" id="joystickArea">
     <div class="joystick" id="joystick"></div>
   </div>
   <div class="percentages" id="percentages">
     X: 0%<br>Y: 0%
   </div>
+  <div class="percentages" id="motors">
+    Left Motor: 0%<br>Right Motor: 0%
+  </div>
   <script>
     const joystick = document.getElementById('joystick');
     const area = document.getElementById('joystickArea');
     const percentages = document.getElementById('percentages');
+    const motors = document.getElementById('motors');
     const areaSize = 220;
     const joySize = 80;
     const maxMove = (areaSize - joySize) / 2;
@@ -75,6 +79,14 @@
       const xPct = Math.round((dx / maxMove) * 100);
       const yPct = Math.round((-dy / maxMove) * 100); // Y is inverted visually
       percentages.innerHTML = `X: ${xPct}%<br>Y: ${yPct}%`;
+      // Map x to steering, y to throttle
+      // Motor mixing: left = throttle + steering, right = throttle - steering
+      // Clamp to [-100, 100]
+      let left = yPct + xPct;
+      let right = yPct - xPct;
+      left = Math.max(-100, Math.min(100, left));
+      right = Math.max(-100, Math.min(100, right));
+      motors.innerHTML = `Left Motor: ${left}%<br>Right Motor: ${right}%`;
     }
 
     function handleMove(clientX, clientY) {

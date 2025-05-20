@@ -179,6 +179,20 @@ Notes:
 - Create drip loops in wiring to prevent water tracking
 - Double-seal critical connections with both heat shrink and silicone
 
+### 🧵 3D Printing Material: PETG
+The hull and any custom 3D-printed parts will be printed using **PETG** filament. After considering PLA, PETG, and other options, PETG was chosen for the following reasons:
+- It is **water-resistant** and won’t degrade with prolonged lake exposure.
+- It is more **heat-resistant** than PLA, making it suitable for outdoor use.
+- It provides a good balance between **durability and printability**, especially for impact-prone areas like the hull.
+- The Anycubic Kobra Max supports PETG well with minimal tuning.
+
+**Recommended PETG Print Settings (starting point):**
+- **Nozzle Temp**: 230–250°C  
+- **Bed Temp**: 70–85°C  
+- **Print Speed**: 40–60 mm/s  
+- **Cooling**: 20–50%, or off for better layer adhesion  
+- **Adhesion**: Use glue stick or PEI bed surface
+
 ## Milestone 1: Desk Test (Battery, Controller, ESCs, Motors)
 
 This milestone verifies basic motor control using the ESP32 controller powered by the battery.
